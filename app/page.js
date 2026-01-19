@@ -1,192 +1,199 @@
-import Image from "next/image";
+"use client";
+import { useState, useEffect } from "react";
+
+/** Simple Copyable Code Block */
+const CodeBlock = ({ children }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    const textToCopy = children.props?.children || children;
+    navigator.clipboard.writeText(textToCopy);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="relative group my-4">
+      <button
+        onClick={handleCopy}
+        className="absolute top-2 right-2 bg-purple-700 text-white px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition"
+      >
+        {copied ? "Copied!" : "Copy"}
+      </button>
+      {children}
+    </div>
+  );
+};
 
 export default function Home() {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    document.title = "Tailwind UI Playground";
+
+    const handleScroll = () => {
+      const scrollTop = document.documentElement.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      setScrollProgress(scrollTop / height);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Playground state
+  const [bgColor, setBgColor] = useState("bg-cyan-500");
+  const [rounding, setRounding] = useState("rounded-lg");
+  const [shadow, setShadow] = useState("shadow-xl shadow-cyan-300/50");
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Navigation Menu */}
-      <nav className="bg-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">TailwindDemo</h1>
-            </div>
-            <div className="hidden md:flex space-x-8">
-              <a href="#buttons" className="text-gray-700 hover:text-indigo-600 transition">Buttons</a>
-              <a href="#colors" className="text-gray-700 hover:text-indigo-600 transition">Colors</a>
-              <a href="#layouts" className="text-gray-700 hover:text-indigo-600 transition">Layouts</a>
-              <a href="#text" className="text-gray-700 hover:text-indigo-600 transition">Typography</a>
-            </div>
-            <button className="md:hidden">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-gray-900 text-gray-100 selection:bg-purple-500 selection:text-black">
+      
+      {/* Scroll Progress */}
+      <div
+        className="fixed top-0 left-0 h-1 bg-purple-500 z-50"
+        style={{ width: `${scrollProgress * 100}%` }}
+      />
+
+      {/* Header */}
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-gray-900/70 border-b border-gray-800 py-4">
+        <div className="max-w-6xl mx-auto flex justify-between items-center px-4">
+          <h1 className="text-2xl font-bold text-purple-400">Tailwind UI Playground</h1>
+          <nav className="space-x-4 hidden md:flex text-gray-300">
+            <a href="#intro" className="hover:text-purple-300 transition">Intro</a>
+            <a href="#playground" className="hover:text-purple-300 transition">Playground</a>
+            <a href="#utilities" className="hover:text-purple-300 transition">Utilities</a>
+            <a href="#examples" className="hover:text-purple-300 transition">Components</a>
+          </nav>
         </div>
-      </nav>
+      </header>
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-5xl font-extrabold text-gray-900 mb-4">
-            Tailwind CSS Components
-          </h1>
-          <p className="text-xl text-gray-600 mb-8">
-            A showcase of beautiful, responsive components built with Tailwind CSS
-          </p>
+      <section id="intro" className="text-center py-24 px-4">
+        <h1 className="text-5xl md:text-6xl font-extrabold mb-6">
+          Build Stunning UI<br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-blue-400">Fast & Interactive</span>
+        </h1>
+        <p className="text-gray-300 max-w-xl mx-auto text-lg mb-8">
+          Explore Tailwind CSS with a live playground, interactive examples, and real-time class changes.
+        </p>
+      </section>
+
+      {/* Interactive Playground */}
+      <section id="playground" className="max-w-4xl mx-auto px-4 py-16">
+        <div className="bg-gray-900/80 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-gray-700 space-y-6">
+          <h2 className="text-3xl font-bold text-purple-400 mb-4">Playground</h2>
+          <p className="text-gray-300 mb-6">Pick classes and watch the box change instantly.</p>
+
+          {/* Controls */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-300 uppercase">Background</h3>
+              <div className="flex gap-2 flex-wrap">
+                {["bg-cyan-500","bg-purple-500","bg-pink-500","bg-blue-500","bg-green-500"].map(c => (
+                  <button
+                    key={c}
+                    className={`${c} w-8 h-8 rounded-full border-2 ${bgColor === c ? "ring-2 ring-white" : "opacity-70"} transition`}
+                    onClick={() => setBgColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-300 uppercase">Border Radius</h3>
+              <div className="flex gap-2 flex-wrap">
+                {["rounded-none","rounded-md","rounded-lg","rounded-full"].map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setRounding(r)}
+                    className={`px-3 py-1 text-xs border border-gray-600 rounded ${rounding === r ? "bg-purple-500 text-white" : "text-gray-300"} transition`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-gray-300 uppercase">Shadow</h3>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  {label:"None", val:"shadow-none"},
+                  {label:"Cyan Glow", val:"shadow-lg shadow-cyan-300/50"},
+                  {label:"Purple Glow", val:"shadow-2xl shadow-purple-400/50"},
+                ].map(s => (
+                  <button
+                    key={s.val}
+                    onClick={() => setShadow(s.val)}
+                    className={`px-3 py-1 text-xs border border-gray-600 rounded ${shadow === s.val ? "bg-purple-500 text-white" : "text-gray-300"} transition`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="flex flex-col items-center mt-8">
+            <div className={`${bgColor} ${rounding} ${shadow} w-48 h-48 flex items-center justify-center font-bold text-white transition duration-500 rounded-2xl`}>
+              Preview
+            </div>
+            <CodeBlock>
+              <div className="bg-black text-green-400 p-3 mt-4 rounded font-mono text-xs border border-gray-700">
+                className="{bgColor} {rounding} {shadow}"
+              </div>
+            </CodeBlock>
+          </div>
         </div>
+      </section>
 
-        {/* Buttons Section */}
-        <section id="buttons" className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Buttons</h2>
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="flex flex-wrap gap-4">
-              <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition">
-                Primary Button
-              </button>
-              <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition">
-                Success Button
-              </button>
-              <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">
-                Danger Button
-              </button>
-              <button className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition">
-                Secondary Button
-              </button>
-              <button className="border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-bold py-2 px-4 rounded transition">
-                Outline Button
-              </button>
-              <button className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-2 px-4 rounded transition">
-                Gradient Button
-              </button>
+      {/* Core Utilities */}
+      <section id="utilities" className="max-w-4xl mx-auto px-4 py-16">
+        <div className="bg-gray-900/80 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-gray-700 space-y-6">
+          <h2 className="text-3xl font-bold text-purple-400 mb-4">Core Utilities</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-300 mb-2">Spacing</h3>
+              <div className="flex flex-wrap gap-4">
+                <div className="p-4 bg-purple-500 rounded text-white">p-4</div>
+                <div className="m-4 p-4 bg-cyan-500 rounded text-white">m-4</div>
+                <div className="px-6 py-2 bg-pink-500 rounded text-white">px-6</div>
+              </div>
             </div>
-          </div>
-        </section>
-
-        {/* Colors Section */}
-        <section id="colors" className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Color Palette</h2>
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              <div className="text-center">
-                <div className="w-full h-24 bg-red-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Red</p>
-              </div>
-              <div className="text-center">
-                <div className="w-full h-24 bg-blue-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Blue</p>
-              </div>
-              <div className="text-center">
-                <div className="w-full h-24 bg-green-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Green</p>
-              </div>
-              <div className="text-center">
-                <div className="w-full h-24 bg-yellow-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Yellow</p>
-              </div>
-              <div className="text-center">
-                <div className="w-full h-24 bg-purple-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Purple</p>
-              </div>
-              <div className="text-center">
-                <div className="w-full h-24 bg-pink-500 rounded-lg mb-2"></div>
-                <p className="text-sm font-medium">Pink</p>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-300 mb-2">Flex</h3>
+              <div className="flex justify-between items-center bg-gray-800 p-4 rounded gap-2">
+                <div className="bg-purple-400 p-2 rounded text-black">1</div>
+                <div className="bg-purple-400 p-2 rounded text-black">2</div>
+                <div className="bg-purple-400 p-2 rounded text-black">3</div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Typography Section */}
-        <section id="text" className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Typography</h2>
-          <div className="bg-white rounded-lg shadow-md p-8 space-y-4">
-            <h1 className="text-5xl font-bold text-gray-900">Heading 1 - Extra Large</h1>
-            <h2 className="text-4xl font-bold text-gray-900">Heading 2 - Large</h2>
-            <h3 className="text-3xl font-bold text-gray-900">Heading 3 - Medium</h3>
-            <p className="text-xl text-gray-700">This is a large paragraph with text-xl class.</p>
-            <p className="text-base text-gray-600">This is a regular paragraph with text-base class.</p>
-            <p className="text-sm text-gray-500">This is small text with text-sm class.</p>
-            <p className="font-bold text-gray-900">This is bold text.</p>
-            <p className="italic text-gray-700">This is italic text.</p>
-            <p className="underline text-blue-600">This is underlined text.</p>
+      {/* Example Components */}
+      <section id="examples" className="max-w-4xl mx-auto px-4 py-16">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-gray-900/70 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-700 hover:scale-105 transition transform">
+            <h3 className="text-purple-400 font-bold text-lg mb-2">Button Example</h3>
+            <button className="bg-gradient-to-r from-purple-500 to-cyan-500 px-4 py-2 rounded-lg text-white font-bold hover:scale-105 transition transform">
+              Click Me
+            </button>
           </div>
-        </section>
-
-        {/* Layouts Section */}
-        <section id="layouts" className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Layout Examples</h2>
-          
-          {/* Grid Layout */}
-          <div className="bg-white rounded-lg shadow-md p-8 mb-8">
-            <h3 className="text-xl font-bold mb-4">Grid Layout</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-gradient-to-br from-blue-400 to-blue-600 text-white p-6 rounded-lg">
-                <h4 className="font-bold text-lg mb-2">Card 1</h4>
-                <p>This is a card in a responsive grid layout.</p>
-              </div>
-              <div className="bg-gradient-to-br from-green-400 to-green-600 text-white p-6 rounded-lg">
-                <h4 className="font-bold text-lg mb-2">Card 2</h4>
-                <p>Grid automatically adjusts to screen size.</p>
-              </div>
-              <div className="bg-gradient-to-br from-purple-400 to-purple-600 text-white p-6 rounded-lg">
-                <h4 className="font-bold text-lg mb-2">Card 3</h4>
-                <p>Three columns on large screens, stacked on mobile.</p>
-              </div>
+          <div className="bg-gray-900/70 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-gray-700 hover:scale-105 transition transform">
+            <h3 className="text-purple-400 font-bold text-lg mb-2">Card Example</h3>
+            <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg shadow-lg text-white">
+              Modern Card Component
             </div>
           </div>
-
-          {/* Flex Layout */}
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h3 className="text-xl font-bold mb-4">Flex Layout</h3>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <div className="bg-red-500 text-white p-4 rounded-lg flex-shrink-0">Item 1</div>
-              <div className="bg-orange-500 text-white p-4 rounded-lg flex-shrink-0">Item 2</div>
-              <div className="bg-yellow-500 text-white p-4 rounded-lg flex-shrink-0">Item 3</div>
-              <div className="bg-teal-500 text-white p-4 rounded-lg flex-shrink-0">Item 4</div>
-            </div>
-          </div>
-        </section>
-
-        {/* Image Section */}
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Images</h2>
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <img 
-                  src="https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=Image+1" 
-                  alt="Placeholder" 
-                  className="w-full rounded-lg shadow-md"
-                />
-                <p className="mt-2 text-center font-medium">Rounded Image</p>
-              </div>
-              <div>
-                <img 
-                  src="https://via.placeholder.com/400x300/10B981/FFFFFF?text=Image+2" 
-                  alt="Placeholder" 
-                  className="w-full rounded-full shadow-md"
-                />
-                <p className="mt-2 text-center font-medium">Circular Image</p>
-              </div>
-              <div>
-                <img 
-                  src="https://via.placeholder.com/400x300/8B5CF6/FFFFFF?text=Image+3" 
-                  alt="Placeholder" 
-                  className="w-full shadow-2xl"
-                />
-                <p className="mt-2 text-center font-medium">Shadow Image</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="text-lg">Built with Next.js and Tailwind CSS</p>
-          <p className="text-sm text-gray-400 mt-2">A beginner-friendly tutorial project</p>
-        </div>
+      <footer className="bg-gray-900/90 p-12 text-center text-gray-300 border-t border-gray-800">
+        <h3 className="text-2xl font-bold text-purple-400 mb-2">Keep Experimenting!</h3>
+        <p>Design beautiful UIs fast with Tailwind CSS.</p>
       </footer>
     </div>
   );
